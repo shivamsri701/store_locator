@@ -14,19 +14,22 @@ from .starbucksScraper import starbucksscraper
 from .pizzahutScraper import pizzahutScraper
 from .tacobellScraper import tacobellScraper
 
-
+#Get User model from auth
 User = get_user_model()
 
 # Create your views here.
 
+#Renders the login and register forms page
 def index(request):
     return render(request, 'index.html')
 
 
+#View to register new user
 def register(request):
     if request.method != 'POST':
         redirect(request, '/')
 
+    #Get register form data
     username = request.POST['username']
     firstname = request.POST['fname']
     email = request.POST['email']
@@ -34,10 +37,13 @@ def register(request):
     password1 = request.POST['password1']
     password2 = request.POST['password2']
 
+    #Check if both passwords are same
     if password1 == password2:
+        #Check if username already exists
         if User.objects.filter(username=username).exists():
             print('Username already exists')
             messages.info(request, 'Username already exists')
+        #Check if email already exists
         elif User.objects.filter(email=email).exists():
             print('Email already exists')
             messages.info(request, 'Email already exists')
@@ -59,6 +65,7 @@ def register(request):
     return redirect('/')
 
 
+#View to handle login
 def login(request):
     if request.method != 'POST':
         return redirect('/')
@@ -76,10 +83,12 @@ def login(request):
 
 
 
+#View to handle logout
 def logout(request):
     auth.logout(request)
     return redirect('/')
 
+#View to render homepage
 def homepage(request):
     if request.user.is_authenticated:
         return render(request, 'homepage.html')
@@ -87,31 +96,43 @@ def homepage(request):
         return redirect('/')
 
 
+#View to handle pizzahut request
 def pizzahut(request):
+    #Check if user is admin 
     if request.user.is_staff:
+        #Start scraper
         pizzahutScraper.delay(request.user.email)
         messages.info(request, "Scraper for Pizzahut stores has started. Confirmation mail will be sent once it's done")
         return redirect('homepage')
     else:
+        #Display data
         storesList = Store.objects.filter(name='Pizza Hut')
         return render(request, 'pizzahut.html', {"storesList" : storesList})
 
+#View to handle tacobell request
 def tacobell(request):
+    #Check if user is admin 
     if request.user.is_staff:
+        #Start scraper
         tacobellScraper.delay(request.user.email)
         messages.info(request, "Scraper for Tacobell stores has started. Confirmation mail will be sent once it's done")
         return redirect('homepage')
     else:
+        #Display data
         storesList = Store.objects.filter(name='Taco Bell')
         return render(request, 'tacobell.html', {"storesList" : storesList})
 
 
+#View to handle starbucks request
 def starbucks(request):
+    #Check if user is admin 
     if request.user.is_staff:
+        #Start scraper
         starbucksscraper.delay(request.user.email)
         messages.info(request, "Scraper for Starbucks stores has started. Confirmation mail will be sent once it's done")
         return redirect('homepage')
     else:
+        #Display data
         storesList = Store.objects.filter(name='Starbucks')
         return render(request, 'starbucks.html', {"storesList" : storesList})
 
@@ -147,6 +168,7 @@ def starbucks(request):
 #         store.save()
 
 
+#View to handle mail for pizzahut stores
 def sendmailpizzahut(request):
     if request.user.is_authenticated:
         send_mail_task.delay('PizzaHut', request.user.email)
@@ -156,6 +178,7 @@ def sendmailpizzahut(request):
     else:
         return redirect('/')
 
+#View to handle mail for tacobell stores
 def sendmailtacobell(request):
     if request.user.is_authenticated:
         send_mail_task.delay('Tacobell', request.user.email)
@@ -164,6 +187,7 @@ def sendmailtacobell(request):
     else:
         return redirect('/')
 
+#View to handle mail for starbucks stores
 def sendmailstarbucks(request):
     if request.user.is_authenticated:
         send_mail_task.delay('Starbucks', request.user.email)

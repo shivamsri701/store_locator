@@ -5,9 +5,10 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
+#Custom User model
 class User(AbstractUser):
     email = models.EmailField(verbose_name="email", max_length=255, unique=True)
-
+    
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
@@ -18,7 +19,7 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
 
-
+#Store model
 class Store(models.Model):
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)

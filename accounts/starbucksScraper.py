@@ -53,6 +53,7 @@ def get_all_zip_codes():
             data.append(row[0])
         return data
 
+
 def get_all_zip_store_data(ziplist):
     finalData = []
     session = requests.Session()
@@ -77,7 +78,7 @@ def store_to_file(data):
     print('Saved data to file')
 
 
-
+#Driver function called from views
 @shared_task
 def starbucksscraper(to):
     print('Scraper for Starbucks stores has started')

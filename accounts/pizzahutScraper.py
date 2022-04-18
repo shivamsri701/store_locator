@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 # from pizzahut import store_to_file
 
 
+#Get webpage using Url
 def get_page(url, session=None):
     print('Retrieving URL: ', url)
     page = session.get(url, headers = {"Content-Type": "application/json; charset=utf-8"})
@@ -19,6 +20,7 @@ def get_page(url, session=None):
     return soup
 
 
+#Get all states from the webpage
 def get_states(soup):
     print('Geting all states from the page')
     states = []
@@ -37,7 +39,7 @@ def get_states(soup):
     # print(data)
     return data
 
-
+#Get all the cities from the webpage
 def get_cities(soup, name):
     print('Getting all cities for state: ', name)
     citiesData = []
@@ -51,6 +53,7 @@ def get_cities(soup, name):
     # print(citiesData)
     return citiesData
 
+#Get all the stores from the webpage
 def get_stores(soup, sname, cname):
     print('Geting all store for state: ', sname, ' and city: ', cname)
     allStores = []
@@ -75,6 +78,7 @@ def get_stores(soup, sname, cname):
 
     return allStores
 
+#Store the list of stores to file
 def store_to_file(data):
     print('Saving data to file')
     with open('pizzahut.csv', 'w') as file:
@@ -84,6 +88,7 @@ def store_to_file(data):
     print('Saved data to file')
 
 
+#Driver function called from views
 @shared_task
 def pizzahutScraper(to):
     print('Scraper for Pizzahut stores has started')
