@@ -13,5 +13,9 @@ urlpatterns = [
     path('sendmailtacobell', views.sendmailtacobell, name='sendmailtacobell'),
     path('starbucks', views.starbucks, name='starbucks'),
     path('sendmailstarbucks', views.sendmailstarbucks, name='sendmailstarbucks'),
-    # path('save_pizzahutstores_to_db', views.save_pizzahutstores_to_db, name='save_pizzahutstores_to_db')
+    path('verizon', views.verizon, name='verizon'),
+    path('sendmailverizon', views.sendmailverizon, name='sendmailverizon'),
+    path('burgerking', views.burgerking, name='burgerking'),
+    path('sendmailburgerking', views.sendmailburgerking, name='sendmailburgerking'),
+    path('save_pizzahutstores_to_db', views.save_pizzahutstores_to_db, name='save_pizzahutstores_to_db')
 ]

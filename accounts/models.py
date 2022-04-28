@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractUser
 #Custom User model
 class User(AbstractUser):
     email = models.EmailField(verbose_name="email", max_length=255, unique=True)
-    
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
@@ -29,9 +29,8 @@ class Store(models.Model):
     state = models.CharField(max_length=100)
     latitude = models.CharField(max_length=20)
     longitude = models.CharField(max_length=20)
-    # class Meta:
-    #     unique_together = ("name", "address")
+    class Meta:
+        unique_together = ("name", "address")
 
     def _str_(self):
         return f"{self.username}"
-

@@ -2,7 +2,6 @@ from email import message
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import get_user_model
-
 from django.contrib import messages
 from .models import Store
 from django.core.mail import send_mail, EmailMessage
@@ -13,6 +12,8 @@ from . mailing import send_mail_task
 from .starbucksScraper import starbucksscraper
 from .pizzahutScraper import pizzahutScraper
 from .tacobellScraper import tacobellScraper
+from .verizonScraper import verizonScraper
+from .burgerkingScraper import burgerkingScraper
 
 #Get User model from auth
 User = get_user_model()
@@ -136,37 +137,65 @@ def starbucks(request):
         storesList = Store.objects.filter(name='Starbucks')
         return render(request, 'starbucks.html', {"storesList" : storesList})
 
+#View to handle verizon request
+def verizon(request):
+    #Check if user is admin 
+    if request.user.is_staff:
+        #Start scraper
+        verizonScraper.delay(request.user.email)
+        messages.info(request, "Scraper for Verizon stores has started. Confirmation mail will be sent once it's done")
+        return redirect('homepage')
+    else:
+        #Display data
+        storesList = Store.objects.filter(name__icontains='Verizon')
+        return render(request, 'verizon.html', {"storesList" : storesList})
 
-# def save_pizzahutstores_to_db(request):
-#     file = open("accounts/tacobellData.csv")
-#     csvreader = csv.reader(file)
-#     header = next(csvreader)
-#     # print(header)
-#     rows = []
-#     for row in csvreader:
-#         rows.append(row)
+#View to handle burgerking request
+def burgerking(request):
+    #Check if user is admin 
+    if request.user.is_staff:
+        #Start scraper
+        burgerkingScraper.delay(request.user.email)
+        messages.info(request, "Scraper for Burgerking stores has started. Confirmation mail will be sent once it's done")
+        return redirect('homepage')
+    else:
+        #Display data
+        storesList = Store.objects.filter(name='Burgerking')[:2000]
+        return render(request, 'burgerking.html', {"storesList" : storesList})
 
-#     for i in range(0, len(rows)):
-#         name = rows[i][0]
-#         address = rows[i][1]
-#         city=rows[i][2]
-#         state=rows[i][3]
-#         zipcode=rows[i][4]
-#         try:
-#             phone=rows[i][5]
-#         except IndexError:
-#             phone = ''
-#         try:
-#             latitude=rows[i][6]
-#         except IndexError:
-#             latitude = ''
-#         try:
-#             longitude=rows[i][7]
-#         except IndexError:
-#             longitude = ''
-#         store = Store(name=name, address=address,city=city, state=state, zipcode=zipcode, phone=phone, latitude=latitude, longitude=longitude)
-#         store.save()
 
+def save_pizzahutstores_to_db(request):
+    file = open("accounts/burgerkingData.csv")
+    csvreader = csv.reader(file)
+    header = next(csvreader)
+    # print(header)
+    rows = []
+    for row in csvreader:
+        rows.append(row)
+
+    for i in range(0, len(rows)):
+        name = rows[i][0]
+        address = rows[i][1]
+        city=rows[i][2]
+        state=rows[i][3]
+        zipcode=rows[i][4]
+        try:
+            phone=rows[i][5]
+        except IndexError:
+            phone = ''
+        try:
+            latitude=rows[i][6]
+        except IndexError:
+            latitude = ''
+        try:
+            longitude=rows[i][7]
+        except IndexError:
+            longitude = ''
+        store = Store(name=name, address=address,city=city, state=state, zipcode=zipcode, phone=phone, latitude=latitude, longitude=longitude)
+        store.save()
+
+    print('Saved data')
+    return None
 
 #View to handle mail for pizzahut stores
 def sendmailpizzahut(request):
@@ -196,3 +225,20 @@ def sendmailstarbucks(request):
     else:
         return redirect('/')
 
+#View to handle mail for verizon stores
+def sendmailverizon(request):
+    if request.user.is_authenticated:
+        send_mail_task.delay('Verizon', request.user.email)
+        messages.info(request, 'Email sent to your registered email address')
+        return redirect('verizon')
+    else:
+        return redirect('/')
+
+#View to handle mail for burgerking stores
+def sendmailburgerking(request):
+    if request.user.is_authenticated:
+        send_mail_task.delay('Burgerking', request.user.email)
+        messages.info(request, 'Email sent to your registered email address')
+        return redirect('burgerking')
+    else:
+        return redirect('/')
