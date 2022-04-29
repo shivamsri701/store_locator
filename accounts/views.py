@@ -160,7 +160,7 @@ def burgerking(request):
         return redirect('homepage')
     else:
         #Display data
-        storesList = Store.objects.filter(name='Burgerking')[:2000]
+        storesList = Store.objects.filter(name='Burgerking')
         return render(request, 'burgerking.html', {"storesList" : storesList})
 
 

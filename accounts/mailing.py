@@ -24,7 +24,7 @@ def send_mail_task(name, email):
     elif name == 'Verizon':
       stores = Store.objects.filter(name__icontains='Verizon').values_list()
     elif name == 'Burgerking':
-      stores = Store.objects.filter(name='Burgerking').values_list()[:2000]
+      stores = Store.objects.filter(name='Burgerking').values_list()
     print('Stores mila', len(stores))
     if stores is not None:
       with open('accounts/{0}.csv'.format(name), 'w') as file:

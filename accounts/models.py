@@ -30,7 +30,7 @@ class Store(models.Model):
     latitude = models.CharField(max_length=20)
     longitude = models.CharField(max_length=20)
     class Meta:
-        unique_together = ("name", "address")
+        unique_together = ("name","address","city", "zipcode", "state", "latitude", "longitude")
 
     def _str_(self):
-        return f"{self.username}"
+        return f"{self.name}"
